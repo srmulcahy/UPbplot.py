@@ -98,8 +98,8 @@ import matplotlib as mpl
 from json import loads
 from pandas import DataFrame
 from optparse import OptionParser
-from ConfigParser import SafeConfigParser  # Python2
-# from configparser import SafeConfigParser  # Python3
+# from ConfigParser import SafeConfigParser  # Python2
+from configparser import SafeConfigParser  # Python3
 from scipy import stats
 from scipy import optimize
 from matplotlib.patches import Ellipse
@@ -242,8 +242,8 @@ def PlotConcConv(ax, axn, Xconv, Yconv, time, age_unit, L, legend_font_size):
     for i in range(len(time)):
         if time[i]/age_unit % L == 0:
             ax[axn].plot(Xconv[i], Yconv[i],
-                         "o", markerfacecolor="white", markeredgecolor="grey",
-                         markeredgewidth=1, markersize=2)
+                         "o", markerfacecolor="white", markeredgecolor="black",
+                         markeredgewidth=0.5, markersize=4)
             ax[axn].annotate(
                 '%s' % int(time[i]/age_unit),
                 xy=(Xconv[i], Yconv[i]),
@@ -267,8 +267,8 @@ def PlotConcTW(ax, axn, Xtw, Ytw, time, age_unit, L, legend_font_size):
     for i in range(len(time)):
         if time[i]/age_unit % L == 0:
             ax[axn].plot(Xtw[i], Ytw[i],
-                         "o", markerfacecolor="white", markeredgecolor="grey",
-                         markeredgewidth=1, markersize=2)
+                         "o", markerfacecolor="white", markeredgecolor="black",
+                         markeredgewidth=0.5, markersize=4)
             ax[axn].annotate(
                 '%s' % int(time[i]/age_unit),
                 xy=(Xtw[i], Ytw[i]), fontsize=legend_font_size-2,
@@ -1664,95 +1664,94 @@ if __name__ == '__main__':
         
         ax[axn].set_title(axn_title, loc='left', fontsize=legend_font_size+6)
         ax[axn].set_xlabel("$^{238}$U / $^{206}$Pb*",
-		           fontsize=legend_font_size+4)
+                           fontsize=legend_font_size+4)
         ax[axn].set_ylabel("$^{207}$Pb* / $^{206}$Pb*",
-		           fontsize=legend_font_size+4)
+                           fontsize=legend_font_size+4)
         ax[axn].set_xlim(range_xy[0][0], range_xy[0][1])
         ax[axn].set_ylim(range_xy[1][0], range_xy[1][1])
 
         PlotConcTW(ax, axn, Xtw, Ytw, time, age_unit,
-	           int(graph_label_interval), legend_font_size)
+                   int(graph_label_interval), legend_font_size)
 
         # Legend data number
         legend_pos_x, legend_pos_y = calc_legend_pos(range_xy)
         legend_pos = 0
-        legend_data_number(ax, axn,
-		           legend_pos_x[legend_pos], legend_pos_y[legend_pos])
+        legend_data_number(ax, axn,legend_pos_x[legend_pos], legend_pos_y[legend_pos])
 
         # plot data point
         if (opt_data_point):
-	    plot_data_point(ax, axn, x, y, ind, outd, outd_disc)
+            plot_data_point(ax, axn, x, y, ind, outd, outd_disc)
 
         # draw error ellipses
         if (opt_data_point_ee):
-	    plot_data_point_error_ellipse(ax, axn, x, y, sigma_x, sigma_y,
-				          cov_xy, dp_ee_cr, ind, outd, outd_disc)
+            plot_data_point_error_ellipse(ax, axn, x, y, sigma_x, sigma_y,cov_xy,dp_ee_cr, 
+                                          ind,outd, outd_disc)
 
         # weighted mean
         if (opt_2D_wm):
-	    legend_pos += 1
-	    plot_2D_wm(ax, axn, x[ind], y[ind],
-		       sigma_x[ind], sigma_y[ind], rho_xy[ind], twm_ee_cr,
-		       legend_pos_x[legend_pos], legend_pos_y[legend_pos])
+            legend_pos += 1
+            plot_2D_wm(ax, axn, x[ind], y[ind],sigma_x[ind], sigma_y[ind], rho_xy[ind], 
+                       twm_ee_cr,legend_pos_x[legend_pos], legend_pos_y[legend_pos])
 
         # Concordia age
         if (opt_concordia_age or opt_concordia_ia):
-	    t_lsq, s_lsq, x_lsq, y_lsq, mswd, pvalue = concordia_age(
-	        'tw', x[ind], y[ind], sigma_x[ind], sigma_y[ind],
-	        rho_xy[ind], ca_cr)
+            t_lsq, s_lsq, x_lsq, y_lsq, mswd, pvalue = concordia_age(
+                'tw', x[ind], y[ind], sigma_x[ind], sigma_y[ind],
+                rho_xy[ind], ca_cr)
 
         if (opt_concordia_age):
-	    legend_pos += 1
-	    plot_concordia_age(
-	        ax, axn, t_lsq, s_lsq, x_lsq, y_lsq, mswd, ca_cr,
-	        legend_pos_x[legend_pos], legend_pos_y[legend_pos])
-	    print(u'Concordia age = %s ±%s %s [%d%% conf.]' %
-	          (format(t_lsq/age_unit,dignum),
-	           format(s_lsq/age_unit,dignum),
-	           age_unit_name, ca_cr*100))
+            legend_pos += 1
+            plot_concordia_age(
+                ax, axn, t_lsq, s_lsq, x_lsq, y_lsq, mswd, ca_cr,
+                legend_pos_x[legend_pos], legend_pos_y[legend_pos])
+            print(u'Concordia age = %s ±%s %s [%d%% conf.]' %
+                  (format(t_lsq/age_unit,dignum),
+                   format(s_lsq/age_unit,dignum),
+                   age_unit_name, ca_cr*100))
 
-	    legend_pos += 1
-	    plot_concordia_age_MSWD(
-	        ax, axn, mswd, ca_mswd, pvalue,
-	        legend_pos_x[legend_pos], legend_pos_y[legend_pos])
-	    if (ca_mswd==1):
-	        print(u'	(MSWD of equivalence=%s, p(chi^2)=%s)' %
-		      (format(mswd,dignum), format(pvalue,dignum)))
-	    elif (ca_mswd==2):
-	        print(u'	(MSWD of combined=%s, p(chi^2)=%s)' %
-		      (format(mswd,dignum), format(pvalue,dignum)))
-	    else:
-	        print(u'	(MSWD of concordance=%s, p(chi^2)=%s)' %
-		      (format(mswd,dignum), format(pvalue,dignum)))
+            legend_pos += 1
+            plot_concordia_age_MSWD(
+                ax, axn, mswd, ca_mswd, pvalue,
+                legend_pos_x[legend_pos], legend_pos_y[legend_pos])
+            
+        if (ca_mswd==1):
+            print(u'	(MSWD of equivalence=%s, p(chi^2)=%s)' %
+                  (format(mswd,dignum), format(pvalue,dignum)))
+        elif (ca_mswd==2):
+            print(u'	(MSWD of combined=%s, p(chi^2)=%s)' %
+                  (format(mswd,dignum), format(pvalue,dignum)))
+        else:
+            print(u'	(MSWD of concordance=%s, p(chi^2)=%s)' %
+                  (format(mswd,dignum), format(pvalue,dignum)))
 
 
         # plot intercept line and band
         if (opt_concordia_ia):
-	    if (concordia_ia_case_tw == 0) or (concordia_ia_case_tw == 2):
-	        legend_pos += 1
-	        case = 0
-	        Tsi, Tmax, Tmin = plot_concordia_intercept_age(
-		    ax, axn, 'tw', x[ind], y[ind],
-		    sigma_x[ind], sigma_y[ind], ia_cr,
-		    rho_xy[ind], range_xy, T_lsq, case,
-		    legend_pos_x[legend_pos], legend_pos_y[legend_pos])
-	        print (('Intercept age = %s +%s %s %s [%d%% conf.]'
-		        % (format(Tsi/age_unit,dignum),
-		           format((Tmax-Tsi)/age_unit,dignum),
-		           format((Tmin-Tsi)/age_unit,dignum), age_unit_name, ia_cr*100)))
+            if (concordia_ia_case_tw == 0) or (concordia_ia_case_tw == 2):
+                legend_pos += 1
+                case = 0
+                Tsi, Tmax, Tmin = plot_concordia_intercept_age(
+                ax, axn, 'tw', x[ind], y[ind],
+                sigma_x[ind], sigma_y[ind], ia_cr,
+                rho_xy[ind], range_xy, T_lsq, case,
+                legend_pos_x[legend_pos], legend_pos_y[legend_pos])
+                print (('Intercept age = %s +%s %s %s [%d%% conf.]'
+                    % (format(Tsi/age_unit,dignum),
+                       format((Tmax-Tsi)/age_unit,dignum),
+                       format((Tmin-Tsi)/age_unit,dignum), age_unit_name, ia_cr*100)))
 
-	    if (concordia_ia_case_tw == 1) or (concordia_ia_case_tw == 2):
-	        legend_pos += 1
-	        case = 1
-	        Tsi, Tmax, Tmin = plot_concordia_intercept_age(
-		    ax, axn, 'tw', x[ind], y[ind],
-		    sigma_x[ind], sigma_y[ind], ia_cr,
-		    rho_xy[ind], range_xy, T_lsq, case,
-		    legend_pos_x[legend_pos], legend_pos_y[legend_pos])
-	        print (('Intercept age = %s +%s %s %s [%d%% conf.]'
-		        % (format(Tsi/age_unit,dignum),
-		           format((Tmax-Tsi)/age_unit,dignum),
-		           format((Tmin-Tsi)/age_unit,dignum), age_unit_name, ia_cr*100)))
+            if (concordia_ia_case_tw == 1) or (concordia_ia_case_tw == 2):
+                legend_pos += 1
+                case = 1
+                Tsi, Tmax, Tmin = plot_concordia_intercept_age(
+                ax, axn, 'tw', x[ind], y[ind],
+                sigma_x[ind], sigma_y[ind], ia_cr,
+                rho_xy[ind], range_xy, T_lsq, case,
+                legend_pos_x[legend_pos], legend_pos_y[legend_pos])
+                print (('Intercept age = %s +%s %s %s [%d%% conf.]'
+                    % (format(Tsi/age_unit,dignum),
+                       format((Tmax-Tsi)/age_unit,dignum),
+                       format((Tmin-Tsi)/age_unit,dignum), age_unit_name, ia_cr*100)))
 
     # ------------------------------------------------
     # Bar plot of 206Pb/238U ages with 1D weighted mean

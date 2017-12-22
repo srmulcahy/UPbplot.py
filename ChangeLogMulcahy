@@ -1,0 +1,23 @@
+# Python 3.2
+
+# Issue TabError:
+# ---
+
+Running 'python UPbplot.py -n -i ./examples/Chang2006ggg_Fig2.csv -d pdf -f' produces the error:
+
+File "UPbplot.py", line 1684
+    plot_data_point(ax, axn, x, y, ind, outd, outd_disc)
+                                                      
+TabError: inconsistent use of tabs and spaces in indentation
+
+Resolution: fixed tab errors between lines 1684-1755
+
+
+# Issue DuplicateOptionError:
+# ---
+
+Running 'python UPbplot.py -n -i ./examples/Chang2006ggg_Fig2.csv -d pdf -f' produces the error:
+
+configparser.DuplicateOptionError: While reading from './examples/Chang2006ggg_Fig2.cfg' [line 238]: option 'twm_ee_alpha' in section 'Graph' already exists
+
+Resolution: Deleted duplicate option in Chang2006ggg_Fig2.cfg
